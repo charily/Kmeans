@@ -1,12 +1,14 @@
-package king.Utils;
+package charily.KMeans;
 
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.mapred.FileInputFormat;
+import org.apache.hadoop.io.Text;
+
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import java.io.IOException;
@@ -45,6 +47,38 @@ public class KMeansDriver {
             System.out.println("finished!");
 
         }
+    }
+    public void KMeansClusterJod() throws IOException, ClassNotFoundException, InterruptedException {
+        Job kMeansClusterJob = new Job();
+        kMeansClusterJob.setJobName("KMeansClusterJob");
+        kMeansClusterJob.setJarByClass(KMeansCluster.class);
+        kMeansClusterJob.getConfiguration().set("clusterPath",outputPath + "/cluster-" + (iterationNum - 1) +"/");
+        kMeansClusterJob.setMapperClass(KMeansCluster.KMeansClusterMapper.class);
+        kMeansClusterJob.setMapOutputKeyClass(Text.class);
+        kMeansClusterJob.setMapOutputKeyClass(IntWritable.class);
+        kMeansClusterJob.setNumReduceTasks(0);
+        FileInputFormat.addInputPath( kMeansClusterJob,new Path(sourcePath));
+        FileOutputFormat.setOutputPath(kMeansClusterJob, new Path(outputPath + "/clusteredInstances" + "/"));
+        kMeansClusterJob.waitForCompletion(true);
+        System.out.println("finished!");
+    }
+    public void generateInitialCluster()
+    {
+        RandomClusterGenerator generator = new RandomClusterGenerator(conf,sourcePath,k);
+        generator.generateInitialCluster(outputPath+"/");
+    }
+    public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException {
+        System.out.println("start");
+        Configuration conf = new Configuration();
+        int k = Integer.parseInt(args[0]);
+        int iterationNum = Integer.parseInt(args[1]);
+        String sourcePath = args[2];
+        String outputPath = args[3];
+        KMeansDriver driver = new KMeansDriver(k,iterationNum,sourcePath,outputPath,conf);
+        driver.generateInitialCluster();
+        System.out.println("initial cluster finished");
+        driver.clusterCenterJob();
+        driver.KMeansClusterJod();
     }
 
 }

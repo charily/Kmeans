@@ -1,4 +1,4 @@
-package king.Utils;
+package charily.KMeans;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;

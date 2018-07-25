@@ -1,4 +1,4 @@
-package king.Utils;
+package charily.KMeans;
 
 
 import org.apache.hadoop.conf.Configuration;

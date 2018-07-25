@@ -1,7 +1,5 @@
-package king.Utils;
+package charily.KMeans;
 
-import king.Utils.Cluster;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
